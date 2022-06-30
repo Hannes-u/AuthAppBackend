@@ -29,8 +29,8 @@ public class AuthAppApplication {
         return args -> {
             userService.saveRole(new Role(null,"Role_User"));
             userService.saveRole(new Role(null,"Role_Admin"));
-            userService.saveUser(new User(null,"hannes","1234",new ArrayList<>()));
-            userService.addRoleToUser("Role_Admin","hannes");
+            userService.saveUser(new User(null,"admin","1234",new ArrayList<>()));
+            userService.addRoleToUser("Role_Admin","admin");
         };
     }
 

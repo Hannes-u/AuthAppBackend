@@ -1,5 +1,6 @@
 package com.example.authapp.Entity;
 
+import com.example.authapp.security.model.UserDetailsImpl;
 import lombok.*;
 import org.hibernate.annotations.ManyToAny;
 import org.springframework.data.repository.cdi.Eager;
@@ -26,8 +27,6 @@ public class User {
     private List<Role> roles;
 
     public UserDetails getUserDetails(){
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        roles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
-        return new org.springframework.security.core.userdetails.User(username,password,authorities);
+        return new UserDetailsImpl(this);
     }
 }

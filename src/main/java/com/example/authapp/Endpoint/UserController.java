@@ -25,13 +25,6 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> saveUser(@RequestBody User user) {
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveUser(user));
-    }
-
     @PostMapping("/saveRole")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Role> saveRole(@RequestBody Role role) {

@@ -1,49 +1,55 @@
 package com.example.authapp.security;
 
 import com.example.authapp.Service.UserService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
 
-import java.util.Arrays;
-
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 @Configuration
-@EnableWebSecurity
-@RequiredArgsConstructor
+@EnableWebSecurity()
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class CustomWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     private final UserService userService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final AuthEntryPointJwt authEntryPointJwt;
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder);
+    @Autowired
+    public CustomWebSecurityConfigurer(UserService userService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, CustomAuthorizationFilter customAuthorizationFilter, AuthEntryPointJwt authEntryPointJwt) {
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
+        this.authEntryPointJwt = authEntryPointJwt;
+    }
+
+    @Bean
+    public CustomAuthorizationFilter authenticationJwtTokenFilter() {
+        return new CustomAuthorizationFilter(jwtUtils,userService);
     }
 
     @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
+    }
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
-        CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
-        // configuration.setAllowedOrigins(Arrays.asList("localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
-        http.cors().configurationSource(request -> configuration);
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(STATELESS);
-        http.authorizeRequests().antMatchers(GET, "/user/**").hasAuthority("ROLE_USER");
-        // to enable open-api or swagger-ui, comment out next line
-        http.authorizeRequests().anyRequest().authenticated();
-        http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean(), jwtUtils));
-        http.addFilterBefore(new CustomAuthorizationFilter(jwtUtils), UsernamePasswordAuthenticationFilter.class);
+        http.cors().and().csrf().disable()
+                .exceptionHandling().authenticationEntryPoint(authEntryPointJwt).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .authorizeRequests().antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/test/**").permitAll()
+                .anyRequest().authenticated();
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
     @Bean
     @Override

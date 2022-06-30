@@ -19,8 +19,6 @@ public class JwtResponse {
 
     @JsonProperty("access_token")
     private String accessToken;
-    @JsonProperty("refresh_token")
-    private String refreshToken;
     private UserDetails userDetails;
 
     private List<String> roles;
@@ -31,9 +29,8 @@ public class JwtResponse {
     private String jwt;
     private Jws<Claims> jws;
 
-    public JwtResponse(String access_token, String refresh_token, UserDetails user) {
+    public JwtResponse(String access_token, UserDetails user) {
         this.accessToken = access_token;
-        this.refreshToken = refresh_token;
         this.userDetails = user;
     }
 
