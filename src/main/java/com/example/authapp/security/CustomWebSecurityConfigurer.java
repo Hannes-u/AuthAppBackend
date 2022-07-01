@@ -25,7 +25,7 @@ public class CustomWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     private final AuthEntryPointJwt authEntryPointJwt;
 
     @Autowired
-    public CustomWebSecurityConfigurer(UserService userService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, CustomAuthorizationFilter customAuthorizationFilter, AuthEntryPointJwt authEntryPointJwt) {
+    public CustomWebSecurityConfigurer(UserService userService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils,  AuthEntryPointJwt authEntryPointJwt) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;

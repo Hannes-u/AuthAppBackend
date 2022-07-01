@@ -1,11 +1,12 @@
 version: "3.7"
 services:
-  db:
-    image: postgres:latest
-    restart: always
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pwd
-      POSTGRES_DB: authdb
-    ports:
-      - 5432:5432
+    mysql-db:
+      image: mysql:latest
+      restart: always
+      environment:
+        MYSQL_ROOT_PASSWORD: password
+        MYSQL_DATABASE: userService
+      ports:
+        - "3306:3306"
+      volumes:
+        - my-db:/var/lib/mysql

@@ -5,6 +5,7 @@ import com.example.authapp.Entity.User;
 import com.example.authapp.Service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -21,11 +22,13 @@ public class UserController {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<User> getUsers() {
         return userService.getAllUsers();
     }
 
     @PostMapping("/saveRole")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Role> saveRole(@RequestBody Role role) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/role/save").toUriString());

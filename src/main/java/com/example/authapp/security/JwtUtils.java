@@ -28,23 +28,13 @@ public class JwtUtils {
 
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
-    public String generateAccessToken(String username, List<String> roles) {
+    public String generateAccessToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .claim(ROLES_CLAIM, roles)
                 .signWith(key)
                 .compact();
     }
-
-    public String generateRefreshTokenFromUser(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setExpiration(new Date(System.currentTimeMillis() + jwtRefreshExpirationMs))
-                .signWith(key)
-                .compact();
-    }
-
 
     public Jws<Claims> parseJwtToken(String authToken) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(authToken);
