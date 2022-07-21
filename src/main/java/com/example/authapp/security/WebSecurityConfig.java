@@ -13,13 +13,13 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.cors().and().csrf().disable()
+    http.cors().and()
             .authorizeRequests().antMatchers("/").permitAll().anyRequest().authenticated().and()
             .exceptionHandling(e -> e
                     .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
             )
             .logout(l -> l
-                    .logoutSuccessUrl("/").permitAll()
+                    .logoutSuccessUrl("/user").permitAll()
             )
             .csrf(c -> c
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
